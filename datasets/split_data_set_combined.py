@@ -87,21 +87,27 @@ class CustomDataset(Dataset):
     def __getitem__(self, idx):
         img_path = os.path.join(self.img_dir, self.img_names[idx])
         lab_path = os.path.join(self.lab_dir, self.img_names[idx]).replace('.jpg', '.txt').replace('.png', '.txt')
+        # print('img_path', img_path)
+        # print('lab_path', lab_path)
+        # lab_path = os.path.join(self.lab_dir, self.img_names[idx]).replace('.json', '.txt').replace('.jpg', '.txt').replace('.png', '.txt')
 
         image = cv2.cvtColor(cv2.imread(img_path), cv2.COLOR_BGR2RGB)
-        label = np.loadtxt(lab_path, ndmin=2)
-        zeros = np.zeros((len(label),1)) + 0.00001
-        ones = np.ones((len(label),1))
-        label[:,[3,4]] = label[:,[3,4]] - 0.01
-        label[:, [3]] = np.minimum(ones, np.maximum(zeros, label[:, [3]]))
-        label[:, [4]] = np.minimum(ones, np.maximum(zeros, label[:, [4]]))
-
-        transformed = self.transform(image=image, bboxes=label[:, 1:], class_labels=label[:, 0])
+        # label = np.loadtxt(lab_path, ndmin=2)
+        # zeros = np.zeros((len(label),1)) + 0.00001
+        # ones = np.ones((len(label),1))
+        # label[:,[3,4]] = label[:,[3,4]] - 0.01
+        # label[:, [3]] = np.minimum(ones, np.maximum(zeros, label[:, [3]]))
+        # label[:, [4]] = np.minimum(ones, np.maximum(zeros, label[:, [4]]))
+        #
+        # transformed = self.transform(image=image, bboxes=label[:, 1:], class_labels=label[:, 0])
+        transformed = self.transform(image=image)
         image = transformed['image'].float()
-        bboxes = transformed['bboxes']
-        labels = transformed['class_labels']
+        # bboxes = transformed['bboxes']
+        # labels = transformed['class_labels']
 
-        merged_labels= np.array([np.concatenate(([np.array(labels[i])],np.array(bboxes[i]))) for i in range(0, len(labels))])
+        # merged_labels= np.array([np.concatenate(([np.array(labels[i])],np.array(bboxes[i]))) for i in range(0, len(labels))])
+
+        merged_labels = 'tmp'
         return image, merged_labels, self.img_names[idx]
 
 
