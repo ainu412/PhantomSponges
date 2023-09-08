@@ -8,7 +8,7 @@ img_size=(640,640)
 batch_size = 8
 num_workers = 4
 max_labels_per_img = 65
-BDD_IMG_DIR = '100k/val'
+BDD_IMG_DIR = 'BDD100K/images/val'
 BDD_LAB_DIR = ''
 
 import torch
