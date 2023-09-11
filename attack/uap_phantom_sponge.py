@@ -1,4 +1,4 @@
-
+import os.path
 import pickle
 import random
 from pathlib import Path
@@ -127,12 +127,13 @@ class IoU(nn.Module):
         return inter[:, :, 0] * inter[:, :, 1]
 
 class UAPPhantomSponge:
-    def __init__(self, patch_folder, train_loader, val_loader, epsilon=0.1, iter_eps=0.05, penalty_regularizer=0,
+    def __init__(self, dataset_dir, dataset_name, patch_folder, train_loader, val_loader,
+                 epsilon=0.1, iter_eps=0.05, penalty_regularizer=0,
                  lambda_1=0.75, lambda_2=0, use_cuda=True, epochs=70, patch_size=[640, 640], models_vers=[5]):
 
         self.use_cuda = use_cuda and torch.cuda.is_available()
         print("CUDA Available: ", self.use_cuda)
-        self.device = torch.device("cuda" if (use_cuda and torch.cuda.is_available()) else "cpu")
+        self.device = torch.device("cuda" if self.use_cuda else "cpu")
 
         self.train_loader = train_loader
         self.val_loader = val_loader
@@ -157,10 +158,11 @@ class UAPPhantomSponge:
         self.patch_size = patch_size
         self.iou = IoU(conf_threshold=0.25, iou_threshold=0.45, img_size=patch_size, device=self.device)
 
-        self.full_patch_folder = "uap_train/" + patch_folder + "/"
+        self.full_patch_folder = dataset_name + "_uap_train/" + patch_folder + "/"
         Path(self.full_patch_folder).mkdir(parents=True, exist_ok=False)
 
-        self.current_dir = "experiments/" + patch_folder
+        self.current_dir = dataset_name + "_experiments/" + patch_folder
+        self.final_patch_in_dataset_dir = os.path.join(dataset_dir, "phantom_patch", patch_folder)
         self.create_folders()
 
         self.current_train_loss = 0.0
@@ -181,6 +183,8 @@ class UAPPhantomSponge:
         Path('/'.join(self.current_dir.split('/')[:2])).mkdir(parents=True, exist_ok=True)
         Path(self.current_dir).mkdir(parents=True, exist_ok=True)
         Path(self.current_dir + '/final_results').mkdir(parents=True, exist_ok=True)
+        Path(self.final_patch_in_dataset_dir + '/final_results').mkdir(parents=True, exist_ok=True)
+
         Path(self.current_dir + '/saved_patches').mkdir(parents=True, exist_ok=True)
         Path(self.current_dir + '/losses').mkdir(parents=True, exist_ok=True)
         Path(self.current_dir + '/testing').mkdir(parents=True, exist_ok=True)
@@ -210,6 +214,8 @@ class UAPPhantomSponge:
         # save patch
         transforms.ToPILImage()(adv_patch).save(
             self.current_dir + '/final_results/final_patch.png', 'PNG')
+        transforms.ToPILImage()(adv_patch).save(
+            os.path.join(self.final_patch_in_dataset_dir, 'final_patch.png'), 'PNG')
 
         # save losses
         with open(self.current_dir + '/losses/train_losses', 'wb') as fp:

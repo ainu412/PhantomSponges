@@ -21,6 +21,11 @@ Install the required packages in [req.txt](https://github.com/AvishagS422/Phanto
 To attack YOLOv4, install the weights file and locate it in ["local_yolos/yolov4/weights"](https://github.com/AvishagS422/PhantomSponges/blob/master/local_yolos/yolov4/weights) folder.
 The Weights file (yolov4.weights) for YOLOv4 can be found [here](https://github.com/WongKinYiu/PyTorch_YOLOv4).
 
+####Installing cuda environment and other dependency packages
+`pip install torch==1.9.1+cu111 torchvision==0.10.1+cu111 torchaudio==0.9.1 -f https://download.pytorch.org/whl/torch_stable.html
+e`
+`pip install -r requirements.txt`
+
 ## Usage
 
 ### Configuration
